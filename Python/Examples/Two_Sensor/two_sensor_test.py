@@ -37,11 +37,10 @@ if __name__ == '__main__':
             err = []
             
         covariance = kg.UpdateCovariance( state_est )
-        u,v = np.linalg.eig(covariance)
+        
         if len(err) > 0:
-            print(err)
             covariance += np.outer(err, err)
-        print(covariance)
+        
             
         time = meas.Time
         print('Estimate {}: {}'.format(time, state_est))
