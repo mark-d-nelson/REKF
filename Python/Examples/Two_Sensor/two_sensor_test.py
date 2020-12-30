@@ -6,8 +6,14 @@ Created on Tue Dec 29 21:43:43 2020
 @author: Mark
 """
 
+import sys 
+sys.path.append('../..')
+
 import ButcherTableau as BT
 import KalmanGain     as KG
+import load_two_sensor_data as ltsd
+import numpy as np
+
 
 if __name__ == '__main__':
     
@@ -15,7 +21,7 @@ if __name__ == '__main__':
     kg = KG.KalmanGain( [], 2, [] )
     
     # load measurement array
-    measurement_array = 
+    measurement_array = ltsd.GetMeasurements()
     
     time       = 0.
     state_est  = np.asarray( [.5, .1] )
