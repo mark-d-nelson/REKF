@@ -2,8 +2,11 @@
 """
 Created on Fri Dec 11 16:06:11 2020
 
-@author: MDnelson
+@author: Mark
 """
+
+import sys 
+sys.path.append('..')
 
 import numpy as np
 import ButcherTableau as BT
