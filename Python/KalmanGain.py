@@ -33,9 +33,9 @@ class KalmanGain:
         self.PrevTime          = 0.
         self.NextTime          = 0.
         if not temporal_function:
-            self.TemporalFunction  = temporal_function
+            self.TemporalFunction = IndentityFunction
         else:
-            self.TemporalFunction  = IndentityFunction
+            self.TemporalFunction = temporal_function
         
         if not angular_index:
             if np.isscalar( angular_index ):
@@ -105,7 +105,7 @@ class KalmanGain:
         H   = self.MeasurementObject.GradientFunction( x )
         Q   = np.matmul(cov, np.transpose(H))
         D   = np.linalg.inv(np.matmul(H, Q) + self.MeasurementObject.Covariance)
-        C   = np.eye(len(cov)) - np.matmul(Q, D)
+        C   = np.eye(len(cov)) - np.matmul(np.matmul(Q, D), H)
         cov = np.matmul(C, cov)
         cov = 0.5 * (cov + np.transpose(cov))
         

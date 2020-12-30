@@ -14,21 +14,23 @@ def GetMeasurements():
     measurements = []
     
     with open('two_sensor_data.csv', newline='') as csvfile:
-            filereader = csv.reader(csvfile, delimiter=',')
-            cnt = 0
-            for row in filereader:
-                print(', '.join(row))
-                cnt += 1
-                if cnt == 1:
-                    continue
+        filereader = csv.reader(csvfile, delimiter=',')
+        cnt = 0
+        for row in filereader:
+            #print(', '.join(row))
+            cnt += 1
+            if cnt == 1:
+                continue
+            
+            if row[1] == 'S1':
                 
-                if row[0] == 'S1':
-                    
-                    meas=M.Measurement(cnt, float(row[2]), float(row[1]), tsf.sensor1transform, tsf.sensor1gradient, 0, row[0])
-                else:
-                    meas=M.Measurement(cnt, float(row[2]), float(row[1]), tsf.sensor2transform, tsf.sensor2gradient, 0, row[0])
-                
-                measurements.append(meas)
+                meas=M.Measurement(float(row[0]), float(row[3]), float(row[2]), \
+                                   tsf.sensor1transform, tsf.sensor1gradient, 0, row[1])
+            else:
+                meas=M.Measurement(float(row[0]), float(row[3]), float(row[2]), \
+                                   tsf.sensor2transform, tsf.sensor2gradient, 0, row[1])
+            
+            measurements.append(meas)
  
                 
     return measurements

@@ -8,26 +8,28 @@ Created on Wed Dec 30 12:09:41 2020
 
 import numpy as np
 
-def sensor1transform(x,y):
-    theta = np.arctan2(y, x)
+def sensor1transform(x):
+    theta = np.arctan2(x[1], x[0])
     
     return theta
 
-def sensor2transform(x,y):
-    theta = np.arctan2(y, x-1.5)
+def sensor2transform(x):
+    theta = np.arctan2(x[1], x[0]-1.5)
     
     return theta
 
-def sensor1gradient(x,y):
-    u = np.zeros([2,1])
-    u[0,0] = -y / (x*x + y*y)
-    u[1,0] = x / (x*x + y*y)
+def sensor1gradient(x):
+    u = np.zeros([1,2])
+    r = x[0]*x[0] + x[1]*x[1]
+    u[0,0] = -x[1] / r
+    u[0,1] =  x[0] / r
     return u
 
-def sensor2gradient(x,y):
-    u = np.zeros([2,1])
-    z = x-1.5
-    u[0,0] = -y / (z*z + y*y)
-    u[1,0] = z / (z*z + y*y)
+def sensor2gradient(x):
+    u = np.zeros([1,2])
+    z = x[0]-1.5
+    r = z*z + x[1]*x[1]
+    u[0,0] = -x[1] / r
+    u[0,1] =  z    / r
     return u
 
