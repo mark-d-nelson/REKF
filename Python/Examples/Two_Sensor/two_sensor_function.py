@@ -23,6 +23,7 @@ def sensor1gradient(x):
     r = x[0]*x[0] + x[1]*x[1]
     u[0,0] = -x[1] / r
     u[0,1] =  x[0] / r
+    
     return u
 
 def sensor2gradient(x):
@@ -31,5 +32,6 @@ def sensor2gradient(x):
     r = z*z + x[1]*x[1]
     u[0,0] = -x[1] / r
     u[0,1] =  z    / r
+    
     return u
 
