@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Dec 29 21:43:43 2020
+Created on Wed Dec 30 19:58:18 2020
 
-@author: Mark
+@author: megan_nelson
 """
 
 import sys 
@@ -11,21 +11,27 @@ sys.path.append('../..')
 
 import ButcherTableau as BT
 import KalmanGain     as KG
-import load_two_sensor_data as ltsd
+import load_ruf_tracking_data as lrtd
 import numpy as np
 
 
 if __name__ == '__main__':
     
+    Q = np.zeros([6, 6])
+    Q[3:6, 3:6] = np.eye(3) * 1e-9
+    
     bt = BT.ButcherTableauExplicitMethods('RK45')
     kg = KG.KalmanGain( [], 2, [] )
     
     # load measurement array
-    measurement_array = ltsd.GetMeasurements()
+    measurement_array = lrtd.GetMeasurements()
     
     time       = 0.
-    state_est  = np.asarray( [.5, .1] )
-    covariance = np.eye(2) * 0.1
+    state_est  = np.asarray( [100., 0., 5., 0., 0., -1. ] )
+    covariance = np.zeros([6, 6])
+    covariance[0:3, 0:3] = np.eye(3) * 100.
+    covariance[3:6, 3:6] = np.eye(3) * 0.05 * 0.05
+
     
     for meas in measurement_array:
         kg.SetGainParam( time, state_est, covariance, meas )
@@ -46,4 +52,3 @@ if __name__ == '__main__':
         print('Estimate {}: {}'.format(time, state_est))
         # if time >= 3.:
         #     break
-        
