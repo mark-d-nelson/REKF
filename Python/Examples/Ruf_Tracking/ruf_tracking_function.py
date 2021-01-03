@@ -8,6 +8,30 @@ Created on Wed Dec 30 20:25:27 2020
 
 import numpy as np
 
+def TemporalDerivative(t, x):
+    A = np.zeros([6,6])
+    A[0:3, 3:6] = np.eye(3)
+    n = .0011
+    A[4,1] = -n*n
+    A[5,2] = 3*n*n
+    A[3,5] = 2*n
+    A[5,3] = -2*n
+    
+    y = np.matmul(A, x)
+    return y
+
+def TemporalDerivative2(x):
+    A = np.zeros([6,6])
+    A[0:3, 3:6] = np.eye(3)
+    n = .0011
+    A[4,1] = -n*n
+    A[5,2] = 3*n*n
+    A[3,5] = 2*n
+    A[5,3] = -2*n
+    
+    y = np.matmul(A, x)
+    return y
+
 def Temporal(x):
     T = np.asarray( \
    [[1.0, 0.0, 1.33099992e-09, 9.99999193e-01, 0.0, 1.09999989e-03], \

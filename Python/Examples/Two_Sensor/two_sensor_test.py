@@ -18,7 +18,7 @@ import numpy as np
 if __name__ == '__main__':
     
     bt = BT.ButcherTableauExplicitMethods('RK45')
-    kg = KG.KalmanGain( [], 2, [] )
+    kg = KG.KalmanGain( [], [], 2, [] )
     
     # load measurement array
     measurement_array = ltsd.GetMeasurements()
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     covariance = np.eye(2) * 0.1
     
     for meas in measurement_array:
-        kg.SetGainParam( time, state_est, covariance, meas )
+        state_est = kg.SetGainParam( time, state_est, covariance, meas )
         
         if bt.HasErrorEstimate():
             state_est, err = bt.IntegrationTimeIndependent(state_est, kg.GetChangeInState)

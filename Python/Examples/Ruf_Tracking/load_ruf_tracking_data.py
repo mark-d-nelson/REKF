@@ -28,8 +28,9 @@ def GetMeasurements():
             cov[0, 0] = float(row[3])
             cov[1, 1] = float(row[5])
             cov[2, 2] = float(row[7])
+            truth = [float(row[8]), float(row[9]), float(row[10])]
             meas=M.Measurement(float(row[0]), m, cov, \
-                               rufunction.Transformation, rufunction.Gradient, [1, 2], row[1])
+                               rufunction.Transformation, rufunction.Gradient, [1, 2], row[1], truth)
             measurements.append(meas)
  
                 

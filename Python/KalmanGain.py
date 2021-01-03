@@ -18,22 +18,19 @@ def AngularDomain( x, angular_index ):
         
     return x
 
-def IndentityFunction(a,b,x):
-    return x.copy()
-
-
-
-
 
 
 class KalmanGain:
     
-    def __init__( self, temporal_function, state_dim, process_noise, angular_index = [] ):
+    def __init__( self, temporal_function, bt, state_dim, process_noise, angular_index = [] ):
     
         self.PrevTime          = 0.
         self.NextTime          = 0.
+        self.TimeStep          = 0.
+        
+        self.PropagationButcherTableau = bt
         if not temporal_function:
-            self.TemporalFunction = IndentityFunction
+            self.TemporalFunction = []
         else:
             self.TemporalFunction = temporal_function
         
@@ -61,6 +58,23 @@ class KalmanGain:
         # constant of .25 = .5 for the two particles +/- U
         # and a second .5 for a transpose to ensure symmetry
         self.cov_weight      = 0.25 / self.sigma_length
+        
+    
+    def Propagate(self, t0, t1, x):
+        if not self.TemporalFunction:
+            return x.copy()
+        
+        self.TimeStep = t1 - t0
+        
+        if self.PropagationButcherTableau.HasErrorEstimate():
+            y, err = self.PropagationButcherTableau.Integration(x, self.DiscreteStep, t0, t1)
+        else:
+            y = self.PropagationButcherTableau.Integration(x, self.DiscreteStep, t0, t1)
+        
+        return y
+        
+    def DiscreteStep(self, t, x):
+        return self.TimeStep * self.TemporalFunction(t, x)
         
     
     def decomposeCovariance(self, cov):
@@ -91,12 +105,18 @@ class KalmanGain:
         
         self.decomposeCovariance(cov)
         self.MeasurementObject = meas_obj
-        self.PrevTime   = time
-        self.NextTime   = self.MeasurementObject.Time
+        self.PrevTime          = time
+        self.NextTime          = self.MeasurementObject.Time
+        
+        # GetState only called after PrevTime and NextTime are set
+        X = self.GetState(x)
+        
         self.innovation = self.MeasurementObject.Estimate - \
-            self.MeasurementObject.TransformFunction( self.GetState(x) )
+            self.MeasurementObject.TransformFunction( X )
             
         self.innovation = AngularDomain( self.innovation, self.MeasurementObject.AngularIndex)
+        
+        return X
         
     # Input variable x is from current measurement
     def UpdateCovariance(self, x):
@@ -115,16 +135,16 @@ class KalmanGain:
     def GetCovariance(self, x):
         
         y = np.zeros(self.extend_dim, dtype='float')
-        y[:self.dimension] = self.TemporalFunction(self.NextTime, self.PrevTime, x)
+        y[:self.dimension] = self.Propagate(self.NextTime, self.PrevTime, x)
         
         cov = np.zeros([self.dimension, self.dimension], dtype='float')
         for k in range(0,self.extend_dim):
-            residual = self.TemporalFunction(self.PrevTime, self.NextTime, \
+            residual = self.Propagate(self.PrevTime, self.NextTime, \
                                              y + self.U[k])[:self.dimension] - x
             residual = AngularDomain( residual, self.AngularIndex )
             cov += np.outer(residual, residual)
             
-            residual = self.TemporalFunction(self.PrevTime, self.NextTime, 
+            residual = self.Propagate(self.PrevTime, self.NextTime, 
                                              y - self.U[k])[:self.dimension] - x
             residual = AngularDomain( residual, self.AngularIndex )
             cov += np.outer(residual, residual)
@@ -134,7 +154,7 @@ class KalmanGain:
     
     # Input variable x is from previous measurement
     def GetState( self, x ):
-        y = self.TemporalFunction(self.PrevTime, self.NextTime, x)
+        y = self.Propagate(self.PrevTime, self.NextTime, x)
         
         y = AngularDomain( y, self.AngularIndex)
         
